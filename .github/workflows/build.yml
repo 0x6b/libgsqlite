@@ -24,7 +24,7 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: linux-x64
-        path: target/release/libxlite.so
+        path: target/release/libgsqlite.so
 
   build-linux-x86:
     runs-on: ubuntu-latest
@@ -37,7 +37,7 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: linux-x86
-        path: target/i686-unknown-linux-gnu/release/libxlite.so
+        path: target/i686-unknown-linux-gnu/release/libgsqlite.so
 
   build-windows-x64:
     runs-on: windows-latest
@@ -52,7 +52,7 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: windows-x64
-        path: target/release/xlite.dll
+        path: target/release/gsqlite.dll
 
   build-windows-x86:
     runs-on: windows-latest
@@ -65,7 +65,7 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: windows-x86
-        path: target/i686-pc-windows-msvc/release/xlite.dll
+        path: target/i686-pc-windows-msvc/release/gsqlite.dll
 
   build-macos-x64:
     runs-on: macos-latest
@@ -80,7 +80,7 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: macos-x64
-        path: target/release/libxlite.dylib
+        path: target/release/libgsqlite.dylib
 
   create-release:
 
@@ -95,15 +95,15 @@ jobs:
       with:
         path: .
     - name: Archive linux-x64
-      run: mv linux-x64/libxlite.so ./libxlite.so && tar -zcvf libxlite-linux-x64.tar.gz libxlite.so && rm libxlite.so
+      run: mv linux-x64/libgsqlite.so ./libgsqlite.so && tar -zcvf libgsqlite-linux-x64.tar.gz libgsqlite.so && rm libgsqlite.so
     - name: Archive linux-x86
-      run: mv linux-x86/libxlite.so ./libxlite.so && tar -zcvf libxlite-linux-x86.tar.gz libxlite.so && rm libxlite.so
+      run: mv linux-x86/libgsqlite.so ./libgsqlite.so && tar -zcvf libgsqlite-linux-x86.tar.gz libgsqlite.so && rm libgsqlite.so
     - name: Archive windows-x64
-      run: mv windows-x64/xlite.dll ./xlite.dll && zip xlite-windows-x64.zip xlite.dll && rm xlite.dll
+      run: mv windows-x64/gsqlite.dll ./gsqlite.dll && zip gsqlite-windows-x64.zip gsqlite.dll && rm gsqlite.dll
     - name: Archive windows-x86
-      run: mv windows-x86/xlite.dll ./xlite.dll && zip xlite-windows-x86.zip xlite.dll && rm xlite.dll
+      run: mv windows-x86/gsqlite.dll ./gsqlite.dll && zip gsqlite-windows-x86.zip gsqlite.dll && rm gsqlite.dll
     - name: Archive macos-x64
-      run: mv macos-x64/libxlite.dylib ./libxlite.dylib && zip libxlite-macos-x64.zip libxlite.dylib && rm libxlite.dylib
+      run: mv macos-x64/libgsqlite.dylib ./libgsqlite.dylib && zip libgsqlite-macos-x64.zip libgsqlite.dylib && rm libgsqlite.dylib
 
     - name: Create Release
       id: create_release
@@ -123,8 +123,8 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./libxlite-linux-x64.tar.gz
-        asset_name: libxlite-linux-x64.tar.gz
+        asset_path: ./libgsqlite-linux-x64.tar.gz
+        asset_name: libgsqlite-linux-x64.tar.gz
         asset_content_type: application/octet-stream
 
     - name: Upload linux-x86 artifact
@@ -133,8 +133,8 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./libxlite-linux-x86.tar.gz
-        asset_name: libxlite-linux-x86.tar.gz
+        asset_path: ./libgsqlite-linux-x86.tar.gz
+        asset_name: libgsqlite-linux-x86.tar.gz
         asset_content_type: application/octet-stream
 
     - name: Upload windows-x64 artifact
@@ -143,8 +143,8 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./xlite-windows-x64.zip
-        asset_name: xlite-windows-x64.zip
+        asset_path: ./gsqlite-windows-x64.zip
+        asset_name: gsqlite-windows-x64.zip
         asset_content_type: application/octet-stream
 
     - name: Upload windows-x86 artifact
@@ -153,8 +153,8 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./xlite-windows-x86.zip
-        asset_name: xlite-windows-x86.zip
+        asset_path: ./gsqlite-windows-x86.zip
+        asset_name: gsqlite-windows-x86.zip
         asset_content_type: application/octet-stream
 
     - name: Upload macos-x64 artifact
@@ -163,6 +163,6 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./libxlite-macos-x64.zip
-        asset_name: libxlite-macos-x64.zip
+        asset_path: ./libgsqlite-macos-x64.zip
+        asset_name: libgsqlite-macos-x64.zip
         asset_content_type: application/octet-stream
