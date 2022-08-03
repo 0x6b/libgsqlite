@@ -2,7 +2,7 @@
 
 A [SQLite](https://www.sqlite.org) extension which loads a [Google Sheet](https://www.google.com/sheets/about/) as a virtual table.
 
-![How it works](media/demo.mp4)
+https://user-images.githubusercontent.com/679719/182612984-3e1156c5-cc95-4450-bb20-2fd76f51aa3d.mp4
 
 ## Tested Platform
 
