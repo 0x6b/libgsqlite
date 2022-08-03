@@ -59,6 +59,7 @@ $ cargo test
    ```
 2. Go to your fork on GitHub, switch to your feature branch, then click "Compare and pull request" button for review.
 
-# Reference
+# References
 
 - [Run-Time Loadable Extensions](https://www.sqlite.org/loadext.html)
+- [The Virtual Table Mechanism Of SQLite](https://sqlite.org/vtab.html)

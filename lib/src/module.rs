@@ -1,5 +1,5 @@
-use crate::error::error_to_sqlite3_string;
 use crate::{
+    error::error_to_sqlite3_string,
     cell_value::yield_cell_value,
     module_argument::collect_options_from_args,
     reader::SheetReader,
@@ -11,8 +11,8 @@ use crate::{
     },
 };
 use google_sheets_api::client::GoogleSheetsReadOnlyClient;
-use std::ffi::CString;
 use std::{
+    ffi::CString,
     env,
     ffi::c_void,
     os::raw::{c_char, c_int, c_longlong},
