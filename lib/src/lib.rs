@@ -1,6 +1,6 @@
 mod cell_value;
 mod error;
-mod module;
+mod module; // entry point
 mod module_argument;
 mod range;
 mod reader;
