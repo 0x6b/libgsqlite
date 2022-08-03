@@ -18,7 +18,7 @@ jobs:
     - name: Build debug
       run: cargo build --verbose
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo test --verbose -- --skip test_extension
     - name: Build release
       run: cargo build --release
     - uses: actions/upload-artifact@v3
@@ -46,7 +46,7 @@ jobs:
     - name: Build debug
       run: cargo build --verbose
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo test --verbose -- --skip test_extension
     - name: Build release
       run: cargo build --release
     - uses: actions/upload-artifact@v3
@@ -74,7 +74,7 @@ jobs:
     - name: Build debug
       run: cargo build --verbose
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo test --verbose -- --skip test_extension
     - name: Build release
       run: cargo build --release
     - uses: actions/upload-artifact@v3
