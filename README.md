@@ -31,7 +31,7 @@ https://user-images.githubusercontent.com/679719/182612984-3e1156c5-cc95-4450-bb
 3. In the API Library, select **Google Sheets API**.
 4. On the API page, click **Enable**.
 
-#### Set up Google OAuth Consent Screen
+#### Setup Google OAuth Consent Screen
 
 1. Go to the [**OAuth consent screen**](https://console.cloud.google.com/apis/credentials/consent) page.
 2. Select **Internal** as User Type, then click **Create**
