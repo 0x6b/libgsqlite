@@ -1,81 +1,127 @@
-# XLite - query Excel (.xlsx, .xls) and Open Document spreadsheets (.ods) as SQLite virtual tables
+# libgsqlite
 
-XLite is a SQLite extension written in Rust. The main purpose of this library is to allow working with spreadsheets from SQLite exposing them as [virtual tables](https://sqlite.org/vtab.html).
+A [SQLite](https://www.sqlite.org) extension which loads a [Google Sheet](https://www.google.com/sheets/about/) as a virtual table.
 
-### Download
+## Tested Platform
 
-![build](https://github.com/x2bool/xlite/actions/workflows/build.yml/badge.svg)
+- [SQLite](https://www.sqlite.org) 3.39.2
+- [Rust](https://www.rust-lang.org) 1.62.1-aarch64-apple-darwin
+- macOS 12.5 (Monterey) on Apple M1 MAX
 
-The following prebuilt libraries are available for [download](https://github.com/x2bool/xlite/releases)
+## Getting Started
 
-|  | Linux | Windows | MacOS |
-|--|--|--|--|
-| x86 | [libxlite.so.tar.gz](https://github.com/x2bool/xlite/releases/latest/download/libxlite-linux-x86.tar.gz)️ | [xlite.dll.zip](https://github.com/x2bool/xlite/releases/latest/download/xlite-windows-x86.zip)️ | N/A |
-| x86-64 | [libxlite.so.tar.gz](https://github.com/x2bool/xlite/releases/latest/download/libxlite-linux-x64.tar.gz)️ | [xlite.dll.zip](https://github.com/x2bool/xlite/releases/latest/download/xlite-windows-x64.zip)️ | [libxlite.dylib.zip](https://github.com/x2bool/xlite/releases/latest/download/libxlite-macos-x64.zip) |
-| AArch64 |   |   |   |
+### Setup Google Cloud
 
-Please contribute the missing build targets if you know how to implement them with GitHub Actions.
+#### Create a Project
 
-### How to build
+1. Log in to the [Google Cloud console](https://console.cloud.google.com/).
+2. Go to the [**Manage resources**](https://console.cloud.google.com/cloud-resource-manager) page.
+3. On the **Select organization** drop-down list at the top of the page, select the organization resource in which you want to create a project.
+4. Click **Create Project**.
+5. In the **New Project** window that appears, enter a project name, say `libgsqlite`, and select a billing account as applicable.
+6. Enter the parent organization or folder resource in the **Location** box.
+7. When you're finished entering new project details, click **Create**.
 
-```bash
-cargo build --release
-```
+#### Enable Google Sheets API for the Project
 
-This step will produce `libxlite.so` or `libxlite.dylib` or `xlite.dll` depending on your operation system.
+1. Go to the [**API Library**](https://console.cloud.google.com/apis/library?project=_) page.
+2. From the projects list, select the project you just created.
+3. In the API Library, select **Google Sheets API**.
+4. On the API page, click **Enable**.
 
-### How to use
+#### Set up Google OAuth Consent Screen
 
-Assuming you have sqlite3 command line tools installed, `libxlite` library in your current directory and some spreadsheet file on your disk you can load extension:
+1. Go to the [**OAuth consent screen**](https://console.cloud.google.com/apis/credentials/consent) page.
+2. Select **Internal** as User Type, then click **Create**
+3. Add required information like an app name (`libgsqlite`) and support email address.
+4. Click **Save and Continue**.
+5. Click **Add or Remove Scopes**.
+6. On the dialog that appears, select the scope `.../auth/spreadsheets.readonly` (See all your Google Sheets spreadsheets) and click **Update**.
+7. Click **Save and Continue**.
+8. Click **Back to Dashboard**.
 
-```bash
-sqlite3 # will open SQLite CLI
-> .load libxlite # or "xlite" on Windows
-```
+#### Create a Credential
 
-This will load `xlite` module, now it can be used to create virtual tables.
+1. Go to the [**Credentials**](https://console.cloud.google.com/apis/credentials) page.
+2. Click **Create Credentials** → **OAuth Client ID**.
+3. Select **Desktop app** as Application Type.
+4. Type `libgsqlite` as Name.
+5. Click **Download JSON** to save your **Client ID** and **Client Secret** locally.
 
-Creating a virtual table (this sample uses the .xslx file from the tests directory):
+### Create a Sample Spreadsheet
 
-```sql
-CREATE VIRTUAL TABLE test_data USING xlite(
-    FILENAME './tests/abcdef.xlsx',
-    WORKSHEET 'Sheet1',
-    RANGE 'A2:F'
-);
-```
+1. Go to [sheet.new](https://sheet.new) to create a new spreadsheet, then copy and paste following data.
 
-Explanation: this statement will create a virtual table based on the .xlsx file and the worksheet named "Sheet1".
+| Employee Number | First Name | Last Name | Department |
+|----------------:|------------|-----------|------------|
+|               1 | Christine  | Haas      | A00        |
+|               2 | Michael    | Thompson  | B01        |
+|               3 | Sally      | Kwan      | C01        |
+|               4 | John       | Beyer     | E01        |
+|               5 | Irving     | Stern     | D11        |
+|               6 | Eva        | Pulaski   | E01        |
 
-Optional `RANGE` parameter is used here to skip the first row in the table. `A2:F` meaning is `use columns from A to F but start from 2nd row`.
+2. Copy the URL of the spreadsheet.
 
-Querying:
+### Query the Spreadsheet with SQLite
 
-```sql
-SELECT A, B, C, D, E, F from test_data;
-```
+1. Setup required environment variables with the credential:
+   ```shell
+   $ export LIBGSQLITE_GOOGLE_CLIENT_ID=... # client_id property in the downloaded JSON
+   $ export LIBGSQLITE_GOOGLE_CLIENT_SECRET=... # client_secret property
+   ```
+2. Launch SQLite:
+   ```shell
+   $ sqlite3
+   ```
+3. Load the extension:
+   ```shell
+   .load libgsqlite # or "gsqlite" on Windows
+   ```
+   If you get `Error: unknown command or invalid arguments: "load". Enter ".help" for help `, your SQLite is not capable for loading an extension. For macOS, install it with `brew install sqlite3`, and use it.
+4. Create a virtual table for your spreadsheet by providing `ID` (url of the spreadsheet), `SHEET` (sheet name), and `RANGE` for module arguments. All three arguments are mandatory. You'll be navigated to Google OAuth consent screen to get a secret to access the spreadsheet. You can create multiple virtual tables from different spreadsheets.
+   ```sql
+   CREATE VIRTUAL TABLE employees USING gsqlite(
+       ID 'https://docs.google.com/spreadsheets/d/...', -- your spreadsheet URL
+       SHEET 'Sheet1', -- name of the sheet
+       RANGE 'A2:D7' -- range to fetch
+   );
+   ```
+5. Go back to your terminal, and run a query as usual:
+   ```sql
+   .mode column
+   .headers on
+   SELECT * FROM employees;
+   SELECT * FROM employees WHERE D LIKE 'E%';
+   ```
 
-Columns are named according to their name (index) in the spreadsheet.
+# Contributing
 
-```sql
-SELECT COUNT(*), D FROM test_data GROUP BY D ORDER BY COUNT(*);
-```
+Please read [CONTRIBUTING](CONTRIBUTING.md) for more detail.
 
-All operations supported by SQLite can be executed on spreadsheets as long as it is supported by the virtual table mechanism.
+# Acknowledgements
 
-Dropping:
+An article, [Extending SQLite with Rust to support Excel files as virtual tables | Sergey Khabibullin](https://sergey.khabibullin.com/sqlite-extensions-in-rust/), and its companion repository [x2bool/xlite](https://github.com/x2bool/xlite), for great write up and inspiration.
 
-```sql
-DROP TABLE test_data;
-```
+# Limitations
 
-This statement will drop only the virtual table. Physical file won't be deleted.
+- The extension will load the spreadsheet only once while creating a virtual table. If you want to pick up recent changes, drop the table and create it again.
+- `INSERT`, `UPDATE` and `DELETE` statements won't be implemented. Welcome PRs.
 
+# Security
 
-### Limitations
+The extension is intended for use in personal, not-shared, environment. The Google Cloud secret will be cached for 59 minutes under the temporary directory (See [`std::env::temp_dir`](https://doc.rust-lang.org/std/env/fn.temp_dir.html)) with fixed name `access_token.json` for your convenience. Note that, as described at the doc, creating a file or directory with a fixed or predictable name may result in “insecure temporary file” security vulnerability.
 
-`INSERT`, `UPDATE` and `DELETE` statements are not supported right now.
+# Privacy
 
-### About
+The extension never send your data to any server.
 
-This project is experimental, use at your own risk. The project is developed in my free time as a way to learn Rust and database systems.
+# License
+
+This extension is released under the MIT License. See [LICENSE](LICENSE) for details.
+
+# References
+
+- [Quickstart: Manage your Google Cloud resources](https://cloud.google.com/resource-manager/docs/manage-google-cloud-resources#create_a_project_resource)
+- [Getting started | Cloud APIs](https://cloud.google.com/apis/docs/getting-started)
+- [Setting up OAuth 2.0](https://support.google.com/cloud/answer/6158849?hl=en&ref_topic=3473162)

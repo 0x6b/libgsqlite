@@ -1,0 +1,18 @@
+[package]
+name = "gsqlite"
+version = "0.1.0"
+edition = "2021"
+authors = ["kaoru <679719+0x6b@users.noreply.github.com>"]
+
+[lib]
+name = "gsqlite"
+crate-type = ["cdylib"]
+
+[dependencies]
+google_sheets_api = { path = "../api" }
+regex = "1.6.0"
+thiserror = "1.0"
+typed-builder = "0.10.0"
+
+[dev-dependencies]
+rusqlite = { version = "0.28.0", features = ["bundled", "load_extension"] }
