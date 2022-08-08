@@ -325,10 +325,7 @@ fn create_declare_table_statement(columns: Vec<String>) -> CString {
 mod tests {
     use crate::module::create_declare_table_statement;
     use rusqlite::{Connection, LoadExtensionGuard};
-    use std::{
-        ffi::CString,
-        {error::Error, path::PathBuf},
-    };
+    use std::{ffi::CString, {error::Error, path::PathBuf}, env};
 
     #[derive(Debug, PartialEq)]
     struct Employee {
@@ -360,9 +357,18 @@ mod tests {
         let conn = Connection::open_in_memory()?;
         load_my_extension(&conn)?;
 
-        let id = env!("LIBGSQLITE_GOOGLE_CLIENT_TEST_ID");
-        let sheet = env!("LIBGSQLITE_GOOGLE_CLIENT_TEST_SHEET");
-        let range = env!("LIBGSQLITE_GOOGLE_CLIENT_TEST_RANGE");
+        let id = match env::var("LIBGSQLITE_GOOGLE_CLIENT_ID") {
+            Ok(v) => v,
+            Err(_) => panic!("Environment variable LIBGSQLITE_GOOGLE_CLIENT_ID is not set"),
+        };
+        let sheet = match env::var("LIBGSQLITE_GOOGLE_CLIENT_TEST_SHEET") {
+            Ok(v) => v,
+            Err(_) => panic!("Environment variable LIBGSQLITE_GOOGLE_CLIENT_TEST_SHEET is not set"),
+        };
+        let range = match env::var("LIBGSQLITE_GOOGLE_CLIENT_TEST_RANGE") {
+            Ok(v) => v,
+            Err(_) => panic!("Environment variable LIBGSQLITE_GOOGLE_CLIENT_TEST_RANGE is not set"),
+        };
         conn.execute(
             format!(
                 r#"CREATE VIRTUAL TABLE employees USING gsqlite(ID '{}', SHEET '{}', RANGE '{}');"#,
