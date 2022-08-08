@@ -19,10 +19,11 @@ use std::{
     io::{BufRead, BufReader, Write},
     net::TcpListener,
     ops::Sub,
-    os::unix::fs::PermissionsExt,
     path::PathBuf,
 };
 use typed_builder::TypedBuilder;
+#[cfg(target_family = "unix")]
+use std::os::unix::fs::PermissionsExt;
 
 #[derive(TypedBuilder)]
 pub struct GoogleSheetsReadOnlyClient {
@@ -176,8 +177,17 @@ impl GoogleSheetsReadOnlyClient {
         if self.cache_access_token {
             let file = File::create(Self::get_access_token_cache_path())?;
             let mut perms = file.metadata()?.permissions();
-            perms.set_readonly(true);
-            perms.set_mode(0o600);
+
+            #[cfg(target_family = "windows")]
+            {
+                perms.set_readonly(true);
+            }
+
+            #[cfg(target_family = "unix")]
+            {
+                perms.set_mode(0o600);
+            }
+
             file.set_permissions(perms)?;
 
             serde_json::to_writer_pretty(
