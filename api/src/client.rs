@@ -13,6 +13,8 @@ use oauth2::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Deserializer;
+#[cfg(target_family = "unix")]
+use std::os::unix::fs::PermissionsExt;
 use std::{
     env::temp_dir,
     fs::File,
@@ -22,8 +24,6 @@ use std::{
     path::PathBuf,
 };
 use typed_builder::TypedBuilder;
-#[cfg(target_family = "unix")]
-use std::os::unix::fs::PermissionsExt;
 
 #[derive(TypedBuilder)]
 pub struct GoogleSheetsReadOnlyClient {

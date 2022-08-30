@@ -1,6 +1,6 @@
 use crate::{
-    error::error_to_sqlite3_string,
     cell_value::yield_cell_value,
+    error::error_to_sqlite3_string,
     module_argument::collect_options_from_args,
     reader::SheetReader,
     sheet::Sheet,
@@ -12,9 +12,9 @@ use crate::{
 };
 use google_sheets_api::client::GoogleSheetsReadOnlyClient;
 use std::{
-    ffi::CString,
     env,
     ffi::c_void,
+    ffi::CString,
     os::raw::{c_char, c_int, c_longlong},
     sync::{Arc, Mutex},
 };
@@ -325,7 +325,11 @@ fn create_declare_table_statement(columns: Vec<String>) -> CString {
 mod tests {
     use crate::module::create_declare_table_statement;
     use rusqlite::{Connection, LoadExtensionGuard};
-    use std::{ffi::CString, {error::Error, path::PathBuf}, env};
+    use std::{
+        env,
+        ffi::CString,
+        {error::Error, path::PathBuf},
+    };
 
     #[derive(Debug, PartialEq)]
     struct Employee {
